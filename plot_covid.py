@@ -104,11 +104,14 @@ class COVID:
 		# create a color iterator
 		colors = itertools.cycle(palette)
 
-		self.p = figure(plot_width = 1200, 
+		self.p = figure(title="Confirmed cases",
+			plot_width = 1200, 
 				plot_height = 400,
 				x_axis_type = 'datetime', 
 				x_range=(ends(covid_data['date']) )
 				)
+
+
 
 		for country,color in zip(countries, colors):
 			country_index = covid_data.loc[country]

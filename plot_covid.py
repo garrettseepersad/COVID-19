@@ -1,4 +1,4 @@
-# %% Load Class 
+# %% Load Library Files
 
 # IMPORT PACKAGES
 import pandas as pd
@@ -12,6 +12,8 @@ from bokeh.models import HoverTool
 import itertools  
 
 from bokeh.layouts import column
+
+# %% Load Classes
 
 def ends(df, x=1):
 	""" Return the start and end of the dataframe 
@@ -48,7 +50,11 @@ class COVID:
 		# Range selector
 		self.select = figure()
 
-	def prepare_data(self,url):
+		# Plot from list
+		self.plot_countries_by_list = True
+
+
+	def prepare_COVID_data(self,url,country_listing=None):
 		""" Downloads the data 
 		1) Read the input URL
 		2) Rename the columns
@@ -87,11 +93,19 @@ class COVID:
 					)
 
 		# REMOVE 0's and 1's
-		covid_data = covid_data.replace(0, np.nan)
-		covid_data = covid_data.replace(1, np.nan)
+		# covid_data = covid_data.replace(0, np.nan)
+		# covid_data = covid_data.replace(1, np.nan)
 		
 		# SORT & REARANGE DATA
-		self.countries = covid_data.country.unique()
+		if country_listing is None:
+			self.plot_countries_by_list = False
+
+		if self.plot_countries_by_list:
+			main_countries = pd.read_csv(country_listing)
+			self.countries = main_countries.countries.unique()
+		else:
+			self.countries = covid_data.country.unique()
+
 		covid_data.set_index('country', inplace = True)
 		self.covid_data = covid_data
 
@@ -111,13 +125,16 @@ class COVID:
 				x_range=(ends(covid_data['date']) )
 				)
 
-
-
 		for country,color in zip(countries, colors):
-			country_index = covid_data.loc[country]
+
+			try:
+				country_index = covid_data.loc[country]
+			except KeyError:
+				print("No country " + country)
+				continue
 
 			#If confirmed cases are greater than threshold
-			if country_index['confirmed'].max() > confirmed_cases_threshold:
+			if (country_index['confirmed'].max() > confirmed_cases_threshold):
 
 				df = count_for_country(covid_data,country)
 				ds = ColumnDataSource(df)
@@ -172,8 +189,10 @@ class COVID:
 url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
 
 data  = COVID()
-data.prepare_data(url)
-data.plot_data(1800)
+country_listing = "data/main_countries.csv"
+data.prepare_COVID_data(url,country_listing)
+data.plot_data(0)
+
 
 
 # %%

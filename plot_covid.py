@@ -46,7 +46,7 @@ class COVID:
 		
 		# Line graph with growing cases
 		self.p = figure()
-		
+
 		# Range selector
 		self.select = figure()
 
@@ -122,7 +122,8 @@ class COVID:
 			plot_width = 1200, 
 				plot_height = 400,
 				x_axis_type = 'datetime', 
-				x_range=(ends(covid_data['date']) )
+				x_range=(ends(covid_data['date'])),
+				sizing_mode = 'scale_width' 
 				)
 
 		for country,color in zip(countries, colors):
@@ -171,7 +172,8 @@ class COVID:
 							x_axis_type = "datetime", 
 							y_axis_type = None,
 							toolbar_location = None, 
-							background_fill_color = "#efefef")
+							background_fill_color = "#efefef",
+							sizing_mode = 'scale_width')
 
 				range_tool = RangeTool(x_range=self.p.x_range)
 				range_tool.overlay.fill_color = "navy"
@@ -194,8 +196,11 @@ data.prepare_COVID_data(url,country_listing)
 data.plot_data(0)
 
 
+column_total = column([data.p, data.select])
+column_total.sizing_mode = 'scale_width'
+# %%
+show(column_total)
 
 # %%
-show(column(data.p, data.select))
 
 # %%

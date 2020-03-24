@@ -109,20 +109,23 @@ class COVID:
 		covid_data.set_index('country', inplace = True)
 		self.covid_data = covid_data
 
-	def plot_data(self,confirmed_cases_threshold):
+	def plot_data(self,confirmed_cases_threshold,xlim_range=None):
 		""" Plot the data """
 
 		countries  = self.countries
 		covid_data = self.covid_data
 
+		if xlim_range is None:
+			xlim_range = (ends(covid_data['date']))
+
 		# create a color iterator
 		colors = itertools.cycle(palette)
 
 		self.p = figure(title="Confirmed cases",
-			plot_width = 1200, 
+			plot_width      = 1200, 
 				plot_height = 400,
 				x_axis_type = 'datetime', 
-				x_range=(ends(covid_data['date'])),
+				x_range     = xlim_range,
 				sizing_mode = 'scale_width' 
 				)
 
@@ -141,8 +144,8 @@ class COVID:
 				ds = ColumnDataSource(df)
 
 				self.p.line(source = ds, 
-					x      = 'date', 
-					y      = 'confirmed', 
+					x          = 'date', 
+					y          = 'confirmed', 
 					line_width = 2, 
 					color      = color, 
 					legend     = country,
@@ -169,6 +172,7 @@ class COVID:
 							plot_height = 130, 
 							plot_width  = 1200, 
 							y_range     = self.p.y_range,
+							x_range = xlim_range,
 							x_axis_type = "datetime", 
 							y_axis_type = None,
 							toolbar_location = None, 
@@ -190,10 +194,12 @@ class COVID:
 
 url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
 
+xlim_range = [np.datetime64('2020-02-25'), np.datetime64('2020-03-24')]
+
 data  = COVID()
 country_listing = "data/main_countries.csv"
 data.prepare_COVID_data(url,country_listing)
-data.plot_data(0)
+data.plot_data(0,xlim_range)
 
 
 column_total = column([data.p, data.select])
